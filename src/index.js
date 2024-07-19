@@ -1,7 +1,6 @@
 import express from "express";
 import CONNECT_DB from "./DB/db.js";
-
-const app = express();
+import { app } from "./app.js";
 
 CONNECT_DB().then(
     app.listen(process.env.PORT,() => {

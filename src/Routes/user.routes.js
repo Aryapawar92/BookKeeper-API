@@ -4,8 +4,14 @@ import  verify  from "../Middlewares/auth.middleware.js";
 
 const router  = Router()
 
+//for user
 router.route('/registeruser').post(registerUser)
 router.route('/loginuser').post(loginUser)
 router.route('/logoutuser').post(verify,logoutUser)
+
+
+
+
+
 
 export default router

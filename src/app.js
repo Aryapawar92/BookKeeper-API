@@ -1,7 +1,7 @@
 import express from 'express'
 import bookRoute from './Routes/books.routes.js'
 import userRoutes from './Routes/user.routes.js'
-import bodyParser from 'body-parser'
+import adminRoutes from './Routes/admin.routes.js'
 import cookieParser from 'cookie-parser'
 
 const app = express()
@@ -16,5 +16,6 @@ app.use(cookieParser())
 
 app.use('/api/v1/books',bookRoute)
 app.use('/api/v1/user',userRoutes)
+app.use('/api/v1/admin',adminRoutes)
 
 export {app}

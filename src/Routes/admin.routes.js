@@ -9,4 +9,6 @@ router.route('/registeradmin').post(registerAdmin)
 router.route('/loginadmin').post(loginAdmin)
 router.route('/logoutadmin').post(verify,logoutAdmin)
 
+
+
 export default router

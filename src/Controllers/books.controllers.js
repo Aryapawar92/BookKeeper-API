@@ -99,4 +99,27 @@ const updateBook = asyncHandler(async (req,res) => {
 
 })
 
-export {addBook,deleteBook,updateBook}
+const searchBook = asyncHandler(async (req,res) => {
+    //take book name from parameter
+    //find book in the database if available show or error
+
+    const bookName = req.query.book
+    console.log(bookName);
+
+    if(!bookName){
+        throw new ApiError(400,"Please Enter Book Name")
+    }
+
+    const findBook = await Book.findOne({name:bookName})
+
+    if(!findBook){
+        throw new ApiError(400,"No book Found")
+    }
+
+    res.status(200).json(
+        new ApiResponse(200,findBook,"Book Found Successfully")
+    )
+    
+})
+
+export {addBook,deleteBook,updateBook,searchBook}

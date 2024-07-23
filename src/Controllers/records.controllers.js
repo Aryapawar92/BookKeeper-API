@@ -40,3 +40,50 @@ const borrowBook = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, borrowing, "Book Borrowed Successfully"));
 });
+
+const returnBook = asyncHandler(async (req, res) => {
+  //take user id and book id
+  //check if user has borrowed book or not
+  //if not give error
+  //if yes then make changes for book borrowing
+
+  const { userName, ISBN } = req.body;
+
+  const book = await Book.findById({ ISBN });
+
+  if (!book) {
+    throw new ApiError(401, "Book Not found");
+  }
+
+  if (!book.isBorrowed) {
+    throw new ApiError(401, "Book was never Borrowed");
+  }
+
+  const user = await User.findById({ userName });
+
+  if (!user) {
+    throw new ApiError(401, "User not Found");
+  }
+
+  const checkIfMatched = await Record.findOne({
+    userName,
+    ISBN,
+    returnDate: null,
+  });
+
+  if (!checkIfMatched) {
+    throw new ApiError(401, "User has not borrowed the book");
+  }
+
+  book.isBorrowed = false;
+  await book.save();
+
+  checkIfMatched.returnDate = Date.now();
+  await checkIfMatched.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, checkIfMatched, "Book Returned Successfully"));
+});
+
+export { borrowBook, returnBook };

@@ -22,7 +22,7 @@ const verify = asyncHandler(async (req, res, next) => {
     if (!user) {
       throw new ApiError(401, "Invalid Access Token");
     }
-    console.log("User:", req.user);
+    //console.log("User:", req.user);
 
     req.user = user;
 

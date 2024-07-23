@@ -18,22 +18,30 @@ const borrowBook = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Enter Username or ISBN");
   }
 
-  const user = User.findById({ userName });
+  const user = await User.find({ userName });
+  console.log(user);
 
   if (!user) {
     throw new ApiError(401, "No user Found");
   }
 
-  const book = await Book.findById({ ISBN });
+  //const book = await Book.find({ ISBN });
+  const updatedBook = await Book.updateOne(
+    { ISBN: ISBN },
+    { $set: { isBorrowed: true } }
+  );
+  console.log(updatedBook);
 
   if (!user) {
     throw new ApiError(401, "No Book found");
   }
 
-  book.isBorrowed = true;
-  await book.save();
-
-  const borrowing = new Record({ userName, ISBN });
+  const borrowing = new Record({
+    userName,
+    ISBN,
+    isBorrowed: true,
+    borrowDate: Date.now(),
+  });
   await borrowing.save();
 
   return res
@@ -49,22 +57,26 @@ const returnBook = asyncHandler(async (req, res) => {
 
   const { userName, ISBN } = req.body;
 
-  const book = await Book.findById({ ISBN });
-
+  const book = await Book.findOne({ ISBN });
   if (!book) {
-    throw new ApiError(401, "Book Not found");
+    throw new ApiError(404, "Book Not Found");
   }
+  console.log("Book from DB:", book);
+
+  console.log("Book isBorrowed status before return check:", book.isBorrowed);
 
   if (!book.isBorrowed) {
-    throw new ApiError(401, "Book was never Borrowed");
+    throw new ApiError(400, "Book was not borrowed");
   }
 
-  const user = await User.findById({ userName });
-
+  // Retrieve and log user data
+  const user = await User.findOne({ userName });
   if (!user) {
-    throw new ApiError(401, "User not Found");
+    throw new ApiError(404, "User Not Found");
   }
+  console.log("User from DB:", user);
 
+  // Retrieve and log record data
   const checkIfMatched = await Record.findOne({
     userName,
     ISBN,
@@ -72,12 +84,16 @@ const returnBook = asyncHandler(async (req, res) => {
   });
 
   if (!checkIfMatched) {
-    throw new ApiError(401, "User has not borrowed the book");
+    throw new ApiError(400, "No matching record found for this book borrow");
   }
+  console.log("Record from DB:", checkIfMatched);
 
+  // Update the book status and save
   book.isBorrowed = false;
+  console.log("Updating book status to:", book.isBorrowed);
   await book.save();
 
+  // Update the record with return date and save
   checkIfMatched.returnDate = Date.now();
   await checkIfMatched.save();
 

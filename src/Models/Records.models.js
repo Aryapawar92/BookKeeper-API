@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import { Book } from "./Books.models";
-import { User } from "./User.models";
+import { Book } from "./Books.models.js";
+import { User } from "./User.models.js";
 
 const recordSchema = new mongoose.Schema(
   {
@@ -12,17 +12,23 @@ const recordSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: User,
     },
-    borrowDate: {
-      type: Date,
+    ISBN: {
+      type: String,
       required: true,
     },
-    dueDate: {
-      type: Date,
+    userName: {
+      type: String,
       required: true,
+    },
+    borrowDate: {
+      type: Date,
+      required: false,
+      default: null,
     },
     returnDate: {
       type: Date,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   { timestamps: true }
